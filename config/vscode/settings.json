@@ -1,0 +1,39 @@
+{
+    "workbench.colorTheme": "Solarized Dark",
+    "java.configuration.runtimes": [
+        {
+          "name": "JavaSE-1.8",
+          "path": "D:\\codebasefile\\JDK",
+          "default": true
+        }
+      ],
+      "liveServer.settings.donotShowInfoMsg": true,
+      "explorer.confirmDelete": false,
+      "github.copilot.editor.enableAutoCompletions": true,
+      "deepseek.apiKey": "747b61b7-197a-40bf-9d76-6d1bcf0ce12d",
+      "deepseek.lang": "cn",
+      "baidu.comate.privateService": "",
+      "baidu.comate.username": "MUSEFALLEN_01",
+      "baidu.comate.license": "1cdb67d9-c7b2-4819-ac06-ca8c9d69531d",
+      "baidu.comate.enableSecurityEnhancement": false,
+      "baidu.comate.linePreferMode": "auto",
+      "baidu.comate.docstringOutputPosition": "sidebar",
+      "baidu.comate.completionLength": "auto",
+      "baidu.comate.superCompletion": {
+        "superCompletion": false,
+        "autoImport": false
+      },
+      "workbench.editor.empty.hint": "hidden",
+      "github.copilot.nextEditSuggestions.enabled": true,
+      "baidu.comate.enableCodelens": {
+        "enableInlineUnitTest": true,
+        "enableInlineExplain": true,
+        "enableInlineDocstring": true,
+        "enableInlineSplit": true,
+        "enableInlineComment": true,
+        "enableInlineOptimize": true,
+        "enableInlineLog": true
+      },
+      "claudeCode.preferredLocation": "panel",
+      "liveServer.settings.donotVerifyTags": true
+}

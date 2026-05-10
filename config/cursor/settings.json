@@ -1,0 +1,17 @@
+{
+    "workbench.colorTheme": "Solarized Dark",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "D:\\codebasefile\\JDK",
+            "default": true
+        }
+    ],
+    "liveServer.settings.donotShowInfoMsg": true,
+    "explorer.confirmDelete": false,
+    "github.copilot.editor.enableAutoCompletions": true,
+    "remote.SSH.remotePlatform": {
+        "hzh.sealos.run_ns-cdu169aj_devbox": "linux"
+    },
+    "claudeCode.preferredLocation": "panel"
+}

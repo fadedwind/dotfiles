@@ -1,3 +1,19 @@
-{
-  "packages": {}
+﻿{
+    "packages":  {
+                     "wt":  {
+                                "link":  "C:\\Users\\fadedwind\\AppData\\Local\\Packages\\Microsoft.WindowsTerminal_8wekyb3d8bbwe\\LocalState",
+                                "target":  "./config/wt",
+                                "type":  "dir"
+                            },
+                     "vscode":  {
+                                    "link":  "C:\\Users\\fadedwind\\AppData\\Roaming\\Code\\User",
+                                    "target":  "./config/vscode",
+                                    "type":  "dir"
+                                },
+                     "cursor":  {
+                                    "link":  "C:\\Users\\fadedwind\\AppData\\Roaming\\Cursor\\User",
+                                    "target":  "./config/cursor",
+                                    "type":  "dir"
+                                }
+                 }
 }

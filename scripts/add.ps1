@@ -7,24 +7,20 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyScript.Path)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$Root = Split-Path -Parent $ScriptDir
 $ConfigDir = Join-Path $Root "config"
-$Target = Join-Path $ConfigDir $Name
 $ManifestPath = Join-Path $Root "manifest.json"
 
 # 读取 manifest
 $manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
 
-# 检查是否已存在
 if ($manifest.packages.PSObject.Properties.Name -contains $Name) {
     Write-Host "[$Name] 已存在于 manifest 中，跳过" -ForegroundColor Yellow
     exit
 }
 
-# 确保 config 目录存在
 New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null
-
-# 标准化路径
 $Source = [System.IO.Path]::GetFullPath($Source)
 
 if (-not (Test-Path $Source)) {
@@ -35,55 +31,54 @@ if (-not (Test-Path $Source)) {
 $item = Get-Item $Source
 $isFile = -not $item.PSIsContainer
 
-# 解析 symlink
+# 确定 Target 路径
+$Target = Join-Path $ConfigDir $Name
+if ($isFile) {
+    $Target = Join-Path $ConfigDir "$Name$($item.Extension)"
+}
+
+# 解析已有 symlink/junction
 $realSource = $Source
 if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
-    $realTarget = if ($isFile) { (Get-Item $Source).Target } else { (Get-Item $Source).Target }
-    if ($realTarget) {
-        if (-not [System.IO.Path]::IsPathRooted($realTarget)) {
-            $realSource = Join-Path (Split-Path $Source -Parent) $realTarget
-        } else {
-            $realSource = $realTarget
-        }
-        Write-Host "[$Name] 原路径是 symlink，解析到: $realSource" -ForegroundColor Cyan
+    $resolved = $item.Target
+    if ($resolved) {
+        $realSource = if ([System.IO.Path]::IsPathRooted($resolved)) { $resolved } else { Join-Path (Split-Path $Source -Parent) $resolved }
+        Write-Host "[$Name] 原路径是 reparse point，解析到: $realSource" -ForegroundColor Cyan
     }
 }
 
-# 如果源已经在 config 目录内，跳过移动
+# 如果源已在 config 内，跳过移动
 $configPath = (Get-Item $ConfigDir).FullName
-$alreadyManaged = $realSource.StartsWith($configPath, [StringComparison]::OrdinalIgnoreCase)
-
-if ($alreadyManaged) {
-    Write-Host "[$Name] 文件已在 config/ 中，直接注册" -ForegroundColor Cyan
-    $Target = $realSource
-} else {
-    # 对于文件：目标保留文件名
-    if ($isFile) {
-        $Target = Join-Path $ConfigDir "$Name$($item.Extension)"
-    }
-
-    # 移动到 config 目录
+if (-not $realSource.StartsWith($configPath, [StringComparison]::OrdinalIgnoreCase)) {
     Move-Item -Path $realSource -Destination $Target -Force
-    Write-Host "[$Name] 已移动: $realSource -> $Target" -ForegroundColor Green
+    Write-Host "[$Name] 移动: $realSource -> $Target" -ForegroundColor Green
+} else {
+    Write-Host "[$Name] 已在 config/ 中，跳过移动" -ForegroundColor Cyan
+    $Target = $realSource
 }
 
-# 在原位创建 symlink
-if (Test-Path $Source) {
-    Remove-Item $Source -Force -Recurse
-}
-# 确保父目录存在
+# 删除原路径（如果还在）
+if (Test-Path $Source) { Remove-Item $Source -Force -Recurse }
+
+# 创建链接
 $parent = Split-Path $Source -Parent
-if (-not (Test-Path $parent)) {
-    New-Item -ItemType Directory -Path $parent -Force | Out-Null
+if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+
+if ($isFile) {
+    # 文件用 Hardlink
+    New-Item -ItemType HardLink -Path $Source -Target $Target | Out-Null
+    Write-Host "[$Name] HardLink: $Source -> $Target" -ForegroundColor Green
+} else {
+    # 文件夹用 Junction（不需要管理员权限）
+    New-Item -ItemType Junction -Path $Source -Target $Target | Out-Null
+    Write-Host "[$Name] Junction: $Source -> $Target" -ForegroundColor Green
 }
-New-Item -ItemType SymbolicLink -Path $Source -Target $Target | Out-Null
-Write-Host "[$Name] symlink: $Source -> $Target" -ForegroundColor Green
 
 # 更新 manifest
-$relTarget = $Target.Replace($Root, '.')
 $manifest.packages | Add-Member -NotePropertyName $Name -NotePropertyValue @{
-    target = $relTarget
+    target = $Target.Replace($Root, '.').Replace('\', '/')
     link   = $Source
+    type   = if ($isFile) { "file" } else { "dir" }
 } -Force
 
 $manifest | ConvertTo-Json -Depth 5 | Set-Content $ManifestPath -Encoding UTF8
