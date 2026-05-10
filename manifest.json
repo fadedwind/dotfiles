@@ -54,6 +54,31 @@
                                        "link":  "C:\\Users\\fadedwind\\.gitconfig",
                                        "target":  "./config/gitconfig.gitconfig",
                                        "type":  "file"
-                                   }
+                                   },
+                     "go-env":  {
+                                    "link":  "C:\\Users\\fadedwind\\AppData\\Roaming\\go\\env",
+                                    "target":  "./config/go-env",
+                                    "type":  "file"
+                                },
+                     "cygwin-bashrc":  {
+                                           "link":  "D:\\codebasefile\\Cygwin\\home\\fadedwind\\.bashrc",
+                                           "target":  "./config/cygwin-bashrc.bashrc",
+                                           "type":  "file"
+                                       },
+                     "cygwin-bash-profile":  {
+                                                 "link":  "D:\\codebasefile\\Cygwin\\home\\fadedwind\\.bash_profile",
+                                                 "target":  "./config/cygwin-bash-profile.bash_profile",
+                                                 "type":  "file"
+                                             },
+                     "cygwin-inputrc":  {
+                                            "link":  "D:\\codebasefile\\Cygwin\\home\\fadedwind\\.inputrc",
+                                            "target":  "./config/cygwin-inputrc.inputrc",
+                                            "type":  "file"
+                                        },
+                     "cygwin-profile":  {
+                                            "link":  "D:\\codebasefile\\Cygwin\\home\\fadedwind\\.profile",
+                                            "target":  "./config/cygwin-profile.profile",
+                                            "type":  "file"
+                                        }
                  }
 }
