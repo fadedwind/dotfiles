@@ -1,0 +1,11 @@
+# 设置用户信息（改成你自己的）
+[user]
+	name = fadedwind
+	email = fadedwind@users.noreply.github.com
+[core]
+	autocrlf = true
+	editor = code --wait
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
