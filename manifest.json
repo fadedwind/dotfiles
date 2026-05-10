@@ -49,6 +49,11 @@
                                          "link":  "C:\\Users\\fadedwind\\.claude.json",
                                          "target":  "./config/claude-json.json",
                                          "type":  "file"
-                                     }
+                                     },
+                     "gitconfig":  {
+                                       "link":  "C:\\Users\\fadedwind\\.gitconfig",
+                                       "target":  "./config/gitconfig.gitconfig",
+                                       "type":  "file"
+                                   }
                  }
 }
