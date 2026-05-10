@@ -12,11 +12,10 @@ $Root = Split-Path -Parent $ScriptDir
 $ConfigDir = Join-Path $Root "config"
 $ManifestPath = Join-Path $Root "manifest.json"
 
-# 读取 manifest
 $manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
 
 if ($manifest.packages.PSObject.Properties.Name -contains $Name) {
-    Write-Host "[$Name] 已存在于 manifest 中，跳过" -ForegroundColor Yellow
+    Write-Host "[$Name] 已存在，跳过" -ForegroundColor Yellow
     exit
 }
 
@@ -31,50 +30,42 @@ if (-not (Test-Path $Source)) {
 $item = Get-Item $Source
 $isFile = -not $item.PSIsContainer
 
-# 确定 Target 路径
+# 确定 Target
 $Target = Join-Path $ConfigDir $Name
 if ($isFile) {
     $Target = Join-Path $ConfigDir "$Name$($item.Extension)"
 }
 
-# 解析已有 symlink/junction
+# 解析已有 junction/symlink
 $realSource = $Source
 if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
     $resolved = $item.Target
     if ($resolved) {
         $realSource = if ([System.IO.Path]::IsPathRooted($resolved)) { $resolved } else { Join-Path (Split-Path $Source -Parent) $resolved }
-        Write-Host "[$Name] 原路径是 reparse point，解析到: $realSource" -ForegroundColor Cyan
     }
 }
 
-# 如果源已在 config 内，跳过移动
 $configPath = (Get-Item $ConfigDir).FullName
-if (-not $realSource.StartsWith($configPath, [StringComparison]::OrdinalIgnoreCase)) {
-    Move-Item -Path $realSource -Destination $Target -Force
-    Write-Host "[$Name] 移动: $realSource -> $Target" -ForegroundColor Green
-} else {
-    Write-Host "[$Name] 已在 config/ 中，跳过移动" -ForegroundColor Cyan
-    $Target = $realSource
-}
-
-# 删除原路径（如果还在）
-if (Test-Path $Source) { Remove-Item $Source -Force -Recurse }
-
-# 创建链接
-$parent = Split-Path $Source -Parent
-if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
 
 if ($isFile) {
-    # 文件用 Hardlink
-    New-Item -ItemType HardLink -Path $Source -Target $Target | Out-Null
-    Write-Host "[$Name] HardLink: $Source -> $Target" -ForegroundColor Green
+    # 文件：跨盘符不能 HardLink/Junction，用复制+定期同步
+    # 把文件复制到 config 目录，原位不动
+    Copy-Item -Path $Source -Destination $Target -Force
+    Write-Host "[$Name] 已复制: $Source -> $Target" -ForegroundColor Green
+    Write-Host "[$Name] 注意: 文件模式下需要用 sync.ps1 同步变更" -ForegroundColor Yellow
 } else {
-    # 文件夹用 Junction（不需要管理员权限）
+    # 文件夹：用 Junction
+    if (-not $realSource.StartsWith($configPath, [StringComparison]::OrdinalIgnoreCase)) {
+        Move-Item -Path $realSource -Destination $Target -Force
+        Write-Host "[$Name] 移动: $realSource -> $Target" -ForegroundColor Green
+    }
+    if (Test-Path $Source) { Remove-Item $Source -Force -Recurse }
+    $parent = Split-Path $Source -Parent
+    if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
     New-Item -ItemType Junction -Path $Source -Target $Target | Out-Null
     Write-Host "[$Name] Junction: $Source -> $Target" -ForegroundColor Green
 }
 
-# 更新 manifest
 $manifest.packages | Add-Member -NotePropertyName $Name -NotePropertyValue @{
     target = $Target.Replace($Root, '.').Replace('\', '/')
     link   = $Source

@@ -14,6 +14,41 @@
                                     "link":  "C:\\Users\\fadedwind\\AppData\\Roaming\\Cursor\\User",
                                     "target":  "./config/cursor",
                                     "type":  "dir"
-                                }
+                                },
+                     "npmrc":  {
+                                   "link":  "C:\\Users\\fadedwind\\.npmrc",
+                                   "target":  "./config/npmrc.npmrc",
+                                   "type":  "file"
+                               },
+                     "yarnrc":  {
+                                    "link":  "C:\\Users\\fadedwind\\.yarnrc",
+                                    "target":  "./config/yarnrc.yarnrc",
+                                    "type":  "file"
+                                },
+                     "zshrc":  {
+                                   "link":  "C:\\Users\\fadedwind\\.zshrc",
+                                   "target":  "./config/zshrc.zshrc",
+                                   "type":  "file"
+                               },
+                     "ssh-config":  {
+                                        "link":  "C:\\Users\\fadedwind\\.ssh\\config",
+                                        "target":  "./config/ssh-config",
+                                        "type":  "file"
+                                    },
+                     "claude-settings":  {
+                                             "link":  "C:\\Users\\fadedwind\\.claude\\settings.json",
+                                             "target":  "./config/claude-settings.json",
+                                             "type":  "file"
+                                         },
+                     "claude-local":  {
+                                          "link":  "C:\\Users\\fadedwind\\.claude\\settings.local.json",
+                                          "target":  "./config/claude-local.json",
+                                          "type":  "file"
+                                      },
+                     "claude-json":  {
+                                         "link":  "C:\\Users\\fadedwind\\.claude.json",
+                                         "target":  "./config/claude-json.json",
+                                         "type":  "file"
+                                     }
                  }
 }
